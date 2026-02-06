@@ -1,3 +1,10 @@
+//
+//  Category.swift
+//  Spendly
+//
+//  Created by francisco eduardo aramburo reyes on 05/02/26.
+//
+
 import Foundation
 import SwiftData
 
@@ -5,7 +12,7 @@ import SwiftData
 final class Category {
     var id: UUID
     var name: String
-    var color: String 
+    var color: String
     
     @Relationship(deleteRule: .cascade, inverse: \Expense.category)
     var expenses: [Expense]?

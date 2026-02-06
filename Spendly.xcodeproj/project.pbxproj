@@ -29,23 +29,9 @@
 		E5CF69852F3576FA004EB84D /* SpendlyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpendlyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		E5CF699A2F357B65004EB84D /* Exceptions for "Spendly" folder in "Spendly" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Models/Category.swift,
-				Models/Expense.swift,
-			);
-			target = E5CF696D2F3576F2004EB84D /* Spendly */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		E5CF69702F3576F2004EB84D /* Spendly */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				E5CF699A2F357B65004EB84D /* Exceptions for "Spendly" folder in "Spendly" target */,
-			);
 			path = Spendly;
 			sourceTree = "<group>";
 		};

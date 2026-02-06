@@ -10,24 +10,45 @@ import SwiftData
 
 @main
 struct SpendlyApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Expense.self,
-            Category.self
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-        
+    @State private var showOnboarding = false
+    
+    private let container: ModelContainer
+    
+    init() {
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            let schema = Schema([
+                Expense.self,
+                Category.self
+            ])
+            let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+            self.container = try ModelContainer(for: schema, configurations: [configuration])
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
-    }()
+    }
     
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    checkFirstLaunch()
+                }
+                .fullScreenCover(isPresented: $showOnboarding) {
+                    OnboardingView()
+                }
         }
-        .modelContainer(sharedModelContainer)
+        .modelContainer(container)
+    }
+    
+    private func checkFirstLaunch() {
+        let context = container.mainContext
+        let fetchDescriptor = FetchDescriptor<Category>()
+        
+        do {
+            let categories = try context.fetch(fetchDescriptor)
+            showOnboarding = categories.isEmpty
+        } catch {
+            showOnboarding = true
+        }
     }
 }

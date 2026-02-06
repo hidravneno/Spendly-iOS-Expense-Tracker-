@@ -1,3 +1,10 @@
+//
+//  Expense.swift
+//  Spendly
+//
+//  Created by francisco eduardo aramburo reyes on 05/02/26.
+//
+
 import Foundation
 import SwiftData
 
