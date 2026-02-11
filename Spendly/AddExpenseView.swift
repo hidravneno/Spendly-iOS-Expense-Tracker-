@@ -1,5 +1,3 @@
-
-
 //
 //  AddExpenseView.swift
 //  Spendly
@@ -14,24 +12,31 @@ struct AddExpenseView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Query private var categories: [Category]
-    
+
+    // Pass an existing expense to enable edit mode
+    var expenseToEdit: Expense? = nil
+
     @State private var amount: String = ""
     @State private var description: String = ""
     @State private var selectedCategory: Category?
     @State private var date: Date = Date()
     @State private var showError = false
     @State private var errorMessage = ""
-    
+
+    private var isEditing: Bool { expenseToEdit != nil }
+
+    // MARK: - Body
+
     var body: some View {
         NavigationStack {
             Form {
                 // Amount Section
                 Section {
                     HStack {
-                        Text(getCurrencySymbol())
+                        Text(currencySymbol())
                             .font(.title2)
                             .foregroundColor(.secondary)
-                        
+
                         TextField("0.00", text: $amount)
                             .keyboardType(.decimalPad)
                             .font(.system(size: 34, weight: .bold, design: .rounded))
@@ -42,14 +47,13 @@ struct AddExpenseView: View {
                     Text("Amount")
                         .font(.subheadline)
                 }
-                
+
                 // Details Section
                 Section {
                     TextField("Description", text: $description)
-                    
+
                     DatePicker("Date", selection: $date, displayedComponents: .date)
-                    
-                    // Category Picker
+
                     Picker("Category", selection: $selectedCategory) {
                         Text("None").tag(nil as Category?)
                         ForEach(categories) { category in
@@ -66,7 +70,7 @@ struct AddExpenseView: View {
                     Text("Details")
                 }
             }
-            .navigationTitle("New Expense")
+            .navigationTitle(isEditing ? "Edit Expense" : "New Expense")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -74,12 +78,13 @@ struct AddExpenseView: View {
                         dismiss()
                     }
                 }
-                
+
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button(isEditing ? "Update" : "Save") {
                         saveExpense()
                     }
                     .fontWeight(.semibold)
+                    .tint(Color(hex: "6BBE66"))
                     .disabled(amount.isEmpty || description.isEmpty)
                 }
             }
@@ -88,59 +93,55 @@ struct AddExpenseView: View {
             } message: {
                 Text(errorMessage)
             }
+            .onAppear {
+                populateFieldsIfEditing()
+            }
         }
     }
-    
+
+    // MARK: - Populate fields when editing
+
+    private func populateFieldsIfEditing() {
+        guard let expense = expenseToEdit else { return }
+        amount = String(format: "%.2f", expense.amount)
+        description = expense.desc
+        date = expense.date
+        selectedCategory = expense.category
+    }
+
+    // MARK: - Save / Update
+
     private func saveExpense() {
-        // Validate amount
-        guard let amountValue = Double(amount.replacingOccurrences(of: ",", with: ".")),
-              amountValue > 0 else {
+        let clean = amount.replacingOccurrences(of: ",", with: ".")
+        guard let amountValue = Double(clean), amountValue > 0 else {
             errorMessage = "Please enter a valid amount"
             showError = true
             return
         }
-        
-        // Create expense
-        let expense = Expense(
-            amount: amountValue,
-            date: date,
-            desc: description,
-            category: selectedCategory
-        )
-        
-        modelContext.insert(expense)
-        
+
+        if let expense = expenseToEdit {
+            // Update existing
+            expense.amount = amountValue
+            expense.date = date
+            expense.desc = description
+            expense.category = selectedCategory
+        } else {
+            // Create new
+            let expense = Expense(
+                amount: amountValue,
+                date: date,
+                desc: description,
+                category: selectedCategory
+            )
+            modelContext.insert(expense)
+        }
+
         do {
             try modelContext.save()
             dismiss()
         } catch {
             errorMessage = "Could not save expense: \(error.localizedDescription)"
             showError = true
-        }
-    }
-    
-    private func getCurrencySymbol() -> String {
-        let currency = UserDefaults.standard.string(forKey: "preferredCurrency") ?? "USD"
-        switch currency {
-        case "USD": return "$"
-        case "MXN": return "$"
-        case "EUR": return "€"
-        case "GBP": return "£"
-        case "JPY": return "¥"
-        default: return "$"
-        }
-    }
-    
-    private func colorFromString(_ colorName: String) -> Color {
-        switch colorName.lowercased() {
-        case "orange": return .orange
-        case "blue": return .blue
-        case "green": return .green
-        case "purple": return .purple
-        case "red": return .red
-        case "pink": return .pink
-        case "gray": return .gray
-        default: return .gray
         }
     }
 }

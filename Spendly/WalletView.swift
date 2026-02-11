@@ -683,6 +683,7 @@ struct AddCategorySheet: View {
 // MARK: - Preview
 
 #Preview {
+    @MainActor in
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(
         for: Expense.self, Category.self, Budget.self,
@@ -724,6 +725,6 @@ struct AddCategorySheet: View {
         ctx.insert(e)
     }
 
-    WalletView()
+    return WalletView()
         .modelContainer(container)
 }

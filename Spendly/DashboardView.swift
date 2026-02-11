@@ -524,10 +524,10 @@ extension Array where Element: Hashable {
 // MARK: - Preview
 
 #Preview {
+    @MainActor in
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: Expense.self, Category.self, configurations: config)
 
-    // Seed data
     let ctx = container.mainContext
     let food = Category(name: "Food", color: "orange")
     let transport = Category(name: "Transport", color: "blue")
@@ -555,6 +555,6 @@ extension Array where Element: Hashable {
         ctx.insert(expense)
     }
 
-    DashboardView()
+    return DashboardView()
         .modelContainer(container)
 }
