@@ -75,7 +75,6 @@ struct DashboardView: View {
     // MARK: - Daily breakdown for bar chart
 
     var dailyTotals: [(day: String, total: Double)] {
-        let calendar = Calendar.current
         var dict: [String: Double] = [:]
         let formatter = DateFormatter()
 
@@ -93,7 +92,6 @@ struct DashboardView: View {
             dict[key, default: 0] += expense.amount
         }
 
-        // Sort by date
         let sorted = filteredExpenses
             .map { formatter.string(from: $0.date) }
             .removingDuplicates()
@@ -125,25 +123,15 @@ struct DashboardView: View {
             ScrollView {
                 VStack(spacing: 20) {
 
-                    // Period Selector
                     periodSelector
 
                     if filteredExpenses.isEmpty {
                         emptyState
                     } else {
-                        // Total Card
                         totalCard
-
-                        // Bar Chart
                         spendingBarChart
-
-                        // Stats Row
                         statsRow
-
-                        // Category Breakdown
                         categoryBreakdown
-
-                        // Recent Transactions
                         recentTransactions
                     }
                 }
@@ -200,14 +188,12 @@ struct DashboardView: View {
 
     private var totalCard: some View {
         ZStack {
-            // Background gradient
             LinearGradient(
                 colors: [Color(hex: "6BBE66"), Color(hex: "3A8A36")],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
 
-            // Decorative circles
             Circle()
                 .fill(Color.white.opacity(0.07))
                 .frame(width: 160, height: 160)
@@ -350,7 +336,6 @@ struct DashboardView: View {
 
             ForEach(filteredExpenses.prefix(5)) { expense in
                 HStack(spacing: 12) {
-                    // Category icon dot
                     Circle()
                         .fill(colorFromString(expense.category?.color ?? "gray").opacity(0.18))
                         .frame(width: 40, height: 40)
@@ -430,7 +415,6 @@ struct StatCard: View {
                     .frame(width: 32, height: 32)
                     .background(color.opacity(0.12))
                     .clipShape(RoundedRectangle(cornerRadius: 8))
-
                 Spacer()
             }
 
@@ -464,7 +448,7 @@ struct CategoryRow: View {
         VStack(spacing: 6) {
             HStack {
                 Circle()
-                    .fill(colorFromString(color))
+                    .fill(colorFromString(color))  // uses global from ColorUtils.swift
                     .frame(width: 10, height: 10)
 
                 Text(name)
@@ -489,7 +473,7 @@ struct CategoryRow: View {
                         .frame(height: 6)
 
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(colorFromString(color))
+                        .fill(colorFromString(color))  // uses global from ColorUtils.swift
                         .frame(width: animate ? geo.size.width * percentage : 0, height: 6)
                         .animation(.easeOut(duration: 0.7), value: animate)
                 }
@@ -499,20 +483,7 @@ struct CategoryRow: View {
     }
 }
 
-// MARK: - Helpers
-
-private func colorFromString(_ colorName: String) -> Color {
-    switch colorName.lowercased() {
-    case "orange": return .orange
-    case "blue":   return .blue
-    case "green":  return Color(hex: "6BBE66")
-    case "purple": return .purple
-    case "red":    return .red
-    case "pink":   return .pink
-    case "gray":   return .gray
-    default:       return .gray
-    }
-}
+// MARK: - Array extension
 
 extension Array where Element: Hashable {
     func removingDuplicates() -> [Element] {
@@ -540,13 +511,13 @@ extension Array where Element: Hashable {
     let now = Date()
 
     let sampleExpenses: [(Double, String, Category, Int)] = [
-        (45.50, "Lunch at Taco Bell", food, -1),
-        (120.00, "Uber to airport", transport, -2),
-        (89.99, "New shoes", shopping, -3),
-        (32.00, "Coffee & breakfast", food, -4),
-        (15.00, "Metro card", transport, -5),
-        (210.00, "Groceries", food, -6),
-        (55.00, "Dinner out", food, -7),
+        (45.50,  "Lunch at Taco Bell",  food,      -1),
+        (120.00, "Uber to airport",     transport, -2),
+        (89.99,  "New shoes",           shopping,  -3),
+        (32.00,  "Coffee & breakfast",  food,      -4),
+        (15.00,  "Metro card",          transport, -5),
+        (210.00, "Groceries",           food,      -6),
+        (55.00,  "Dinner out",          food,      -7),
     ]
 
     for (amount, desc, category, daysAgo) in sampleExpenses {
